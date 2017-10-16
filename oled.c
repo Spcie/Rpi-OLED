@@ -1,3 +1,19 @@
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/fs.h>
+#include <linux/errno.h>
+#include <linux/slab.h>
+#include <linux/mm.h>
+#include <linux/sched.h>
+#include <linux/init.h>
+#include <linux/cdev.h>
+#include <linux/slab.h>
+#include <asm/io.h>
+#include <linux/miscdevice.h>
+#include <asm/uaccess.h>
+
+#include "hw_gpio.h"
+#include "hw_i2c.h"
 
 
 static void OLED_WriteCmd(unsigned char cmd);
@@ -15,47 +31,9 @@ int IIC_Init(void);
 
 int IIC_Init(void)
 {
-
+	bcm2835_gpio = (volatile unsigned int *)ioremap(0x3f200000, 0x01000000);
+	//
 }
-
-
-int IIC_Write(unsigned char REG_Address,unsigned char REG_data)		     
-{
- 	IIC_Start();                                
-	IIC_SendByte(SlaveAddress);                
-	IIC_SendByte(REG_Address);                  
-	IIC_SendByte(REG_data);                     
-	IIC_Stop();                                 
-	return 0;
-}
-
- char IIC_Read(unsigned char REG_Address)
-{   
-	unsigned char REG_data;     	
-  	IIC_Start();                              
-	IIC_SendByte(SlaveAddress);               
-	IIC_SendByte(REG_Address);                
-	IIC_Start();                              
-	IIC_SendByte(SlaveAddress+1);             
-	REG_data = IIC_RecvByte();                
-	IIC_SendAck(1);                           
-	IIC_Stop();                               
-	return REG_data;
-}						      
-
-
-
-int main(void)
-{
-	printf("OLED init\n");
-	OLED_Init();
-	printf("OLED Operation Start\n");
-	OLED_StringShow(0,0,"Hello World!");
-	printf("OLED Operation End\n");
-	return 0;
-}
-
-
 
 void OLED_Init(void)
 {
