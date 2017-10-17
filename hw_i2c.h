@@ -2,6 +2,10 @@
 #define __HW_I2C_H
 
 
+
+#define BCM_BSC0_BASE		0x00205000;
+#define BCM_BSC1_BASE		0x00804000;
+
 #define BCM_BSC_C 			0x0000 // BSC Master Control 
 #define BCM_BSC_S 			0x0004 // BSC Master Status 
 #define BCM_BSC_DLEN		0x0008 // BSC Master Data Length 
@@ -54,9 +58,17 @@ typedef enum
 } bcmI2CReasonCodes;
 
 
+typedef enum 
+{
+	BCM_BSC0 = 0X00;	
+	BCM_BSC1 = 0X01;
+	BCM_BSC_ALL = 0X02;   //without BSC2 
+}bcmBSC;
 
-void bcm_i2c_init(void);
-void bcm_i2c_uninit(void);
+int bcm_i2c_init(volatile unsigned int* peripherals_base, bcmBSC bsc_choice);
+void bcm_i2c_uninit(bcmBSC bsc_choice);
+int bcm_i2c_ReplaceBSC(bcmBSC bsc_choice);
+void bcm_i2c_setSlaveAddress(unsigned char addr);
 void bcm_i2c_write(const char * buf, unsigned int len);
 void bcm_i2c_read(char * buf, unsigned int len);
 #endif
