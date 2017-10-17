@@ -12,6 +12,7 @@
 #include <linux/miscdevice.h>
 #include <asm/uaccess.h>
 
+#include "hw_delay.h"
 #include "hw_gpio.h"
 #include "hw_i2c.h"
 
@@ -26,7 +27,7 @@ void OLED_Init(void)
 {
 	IIC_Init();
 
-	OLED_DelayMs(ms);
+	OLED_DelayMs(500);
 
 	OLED_WriteCmd(0xAE);
 	OLED_WriteCmd(0x00);
