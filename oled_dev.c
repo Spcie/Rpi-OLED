@@ -37,10 +37,11 @@ int IoCtrl_release(struct inode * inode, struct file *filp)
 static ssize_t IoCtrl_read(struct file *filp, char __user *buf, size_t size, loff_t *ppos)
 {
 	int ret = 0;
-
+	
+	printk("----- misc read-----\n");
 	OLED_Init();
 	
-	OLED_StringShow(0,0,"hello word")
+	OLED_StringShow(0,0,"hello word");
 	return ret;
 }
 
