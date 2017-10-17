@@ -1,7 +1,7 @@
 ifneq ($(KERNELRELEASE),)
 
 obj-m := OLED_Dev.o
-RpiGpio-objs :=hw_gpio.o hw_i2c.o hw_delay.o oled.o oled_dev.o
+OLED_Dev-objs :=hw_gpio.o hw_i2c.o hw_delay.o oled.o oled_dev.o
 
 else
 
