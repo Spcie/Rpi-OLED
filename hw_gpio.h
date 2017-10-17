@@ -1,7 +1,7 @@
 #ifndef __HW_GPIO_H
 #define __HW_GPIO_H
 
-
+#define BCM_GPIO_BASE 					 0x00200000
 
 #define BCM_GPFSEL0                      0x0000 // GPIO Function Select 0
 #define BCM_GPFSEL1                      0x0004 // GPIO Function Select 1
@@ -33,6 +33,11 @@
 #define BCM_GPPUDCLK0                    0x0098 // GPIO Pin Pull-up/down Enable Clock 0
 #define BCM_GPPUDCLK1                    0x009c // GPIO Pin Pull-up/down Enable Clock 1
 
+typedef enum
+{
+	RPI_GPIO_02 = 2;
+	RPI_GPIO_03 = 3;
+}bcmGpio;
 
 typedef enum
 {
@@ -47,7 +52,10 @@ typedef enum
     BCM_GPIO_FSEL_MASK  = 0x07    // Function select bits mask 0b111 */
 } bcmFunctionSelect;
 
+int bcm_gpio_init(volatile unsigned int* peripherals_base);
+void bcm_gpio_unint(void);
 void bcm_gpio_fsel(unsigned char pin, unsigned char mode);
 void bcm_gpio_set(unsigned char pin);
 void bcm_gpio_clr(unsigned char pin);
+
 #endif /*__HW_GPIO_H*/
