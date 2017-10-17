@@ -15,7 +15,8 @@
 #include "hw_reg.h"
 #include "hw_gpio.h"
 
-volatile unsigned int*  bcm_gpio;
+
+static volatile unsigned int*  bcm_gpio = 0x00000000;
 
 static void bcm_gpio_register_write_nb(volatile unsigned int* pAddr,unsigned int value);
 static void bcm_gpio_register_write(volatile unsigned int* pAddr,unsigned int value);
@@ -50,13 +51,31 @@ static unsigned int bcm_gpio_register_read(volatile unsigned int* pAddr)
 	return ret;
 }
 
-static void bcm_gpio_set_bits(volatile unsigned int pAddr,unsigned int value,unsigned int mask)
+static void bcm_gpio_set_bits(volatile unsigned int* pAddr,unsigned int value,unsigned int mask)
 {
 	unsigned int val = bcm_gpio_register_read(pAddr);
 
 	val = (val&~mask) | (value & mask);
 
 	bcm_gpio_register_write(pAddr,val);
+}
+
+int bcm_gpio_init(volatile unsigned int* peripherals_base)
+{
+	if(bcm_gpio == 0x00000000)
+	{
+		bcm_gpio = peripherals_base + BCM_GPIO_BASE/4;
+		return 0;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+void bcm_gpio_unint(void)
+{
+	bcm_gpio = 0x00000000;
 }
 
 void bcm_gpio_fsel(unsigned char pin, unsigned char mode)
@@ -81,3 +100,4 @@ void bcm_gpio_clr(unsigned char pin)
     unsigned char shift = pin % 32;
     bcm_gpio_register_write(paddr, 1 << shift);
 }
+
