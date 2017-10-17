@@ -1,4 +1,3 @@
-
 #include "hw_delay.h"
 
 volatile static unsigned int* bcm_SysTimer;

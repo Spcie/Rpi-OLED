@@ -15,37 +15,12 @@
 #include "hw_gpio.h"
 #include "hw_i2c.h"
 
-
+static void OLED_DelayMs(unsigned int ms);
 static void OLED_WriteCmd(unsigned char cmd);
 static void OLED_WriteData(unsigned char dat);
 static void OLED_Fill(unsigned char FillData);
 static void OLED_SetPos(unsigned char x, unsigned char y);
-
-void OLED_Init(void);
-void OLED_StringShow(unsigned char x, unsigned char y,unsigned char ch[]);
-
-int IIC_Init(void);
-
-
-
-
-int IIC_Init(void)
-{
-	volatile unsigned int* bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
-
-	//delay init
-	bcm_st_init(bcm_peripherals_base);
-
-	//gpio init 
-	bcm_gpio_init(bcm_peripherals_base);
-	bcm_gpio_fsel(RPI_GPIO_02, BCM_GPIO_FSEL_ALT1);
-	bcm_gpio_fsel(RPI_GPIO_03, BCM_GPIO_FSEL_ALT1);
-
-	//i2c init
-	bcm_i2c_init(bcm_peripherals_base,BCM_BSC1);
-	bcm_i2c_ReplaceBSC(BCM_BSC1);
-	bcm_i2c_setSlaveAddress(0x078);
-}
+static int IIC_Init(void);
 
 void OLED_Init(void)
 {
@@ -85,7 +60,25 @@ void OLED_Init(void)
 	OLED_SetPos(0,0);
 }
 
-void OLED_DelayMs(unsigned int ms)
+static int IIC_Init(void)
+{
+	volatile unsigned int* bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
+
+	//delay init
+	bcm_st_init(bcm_peripherals_base);
+
+	//gpio init 
+	bcm_gpio_init(bcm_peripherals_base);
+	bcm_gpio_fsel(RPI_GPIO_02, BCM_GPIO_FSEL_ALT1);
+	bcm_gpio_fsel(RPI_GPIO_03, BCM_GPIO_FSEL_ALT1);
+
+	//i2c init
+	bcm_i2c_init(bcm_peripherals_base,BCM_BSC1);
+	bcm_i2c_ReplaceBSC(BCM_BSC1);
+	bcm_i2c_setSlaveAddress(0x078);
+}
+
+static void OLED_DelayMs(unsigned int ms)
 {
 	bcm_st_delay_ms(ms);
 }
