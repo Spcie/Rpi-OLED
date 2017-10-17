@@ -1,12 +1,12 @@
 #include "hw_i2c.h"
 #include "hw_gpio.h"
 
+static void bcm_i2c_set_bits(unsigned int RegOfst,unsigned int value,unsigned int mask);
 static volatile unsigned int *bcm_bsc_base = 0x00000000;
 static volatile unsigned int *bcm_bsc0_base = 0x00000000;
 static volatile unsigned int *bcm_bsc1_base = 0x00000000;
 static int i2c_byte_wait_us = 0;
 
-static void bcm_i2c_set_bits(unsigned int RegOfst,unsigned int value);
 static void bcm_i2c_register_write_nb(unsigned int RegOfst,unsigned int value);
 static void bcm_i2c_register_write(unsigned int RegOfst,unsigned int value);
 static unsigned int bcm_i2c_register_read_nb(unsigned int RegOfst);
@@ -18,14 +18,14 @@ static void bcm_i2c_end(void);
 
 static void bcm_i2c_register_write_nb(unsigned int RegOfst,unsigned int value)
 {
-	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst/4;
+	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst / 4;
 
 	*pAddr = value;
 }
 
 static void bcm_i2c_register_write(unsigned int RegOfst,unsigned int value)
 {
-	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst/4;
+	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst / 4;
 	
 	__sync_synchronize();
 	*pAddr = value;
@@ -35,7 +35,7 @@ static void bcm_i2c_register_write(unsigned int RegOfst,unsigned int value)
 
 static unsigned int bcm_i2c_register_read_nb(unsigned int RegOfst)
 {
-	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst/4;
+	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst / 4;
 
 	return *pAddr;
 }
@@ -43,7 +43,7 @@ static unsigned int bcm_i2c_register_read_nb(unsigned int RegOfst)
 static unsigned int bcm_i2c_register_read(unsigned int RegOfst)
 {
 	unsigned int ret;
-	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst/4;
+	volatile unsigned int* pAddr = bcm_bsc_base + RegOfst / 4;
 
 	__sync_synchronize();
 	ret = *pAddr;
@@ -63,7 +63,7 @@ static void bcm_i2c_set_bits(unsigned int RegOfst,unsigned int value,unsigned in
 
 static void bcm_i2c_setClockDivider(unsigned int divider)
 {
-	bcm_peri_write(BCM_BSC_DIV, divider&0xFF);
+	bcm_i2c_register_write(BCM_BSC_DIV, divider&0xFF);
 	
 	i2c_byte_wait_us = ((float)divider / BCM_CORE_CLK_HZ) *  1000000 * 9;
 }
@@ -95,16 +95,16 @@ int bcm_i2c_init(volatile unsigned int* peripherals_base, bcmBSC bsc_choice)
 	switch(bsc_choice)
 	{
 		case BCM_BSC0:
-			bcm_bsc0_base = peripherals_base + BCM_BSC0_BASE/4;
+			bcm_bsc0_base = peripherals_base + BCM_BSC0_BASE / 4;
 			ret = 0;
 		break;
 		case BCM_BSC1:
-			bcm_bsc1_base = peripherals_base + BCM_BSC1_BASE/4;
+			bcm_bsc1_base = peripherals_base + BCM_BSC1_BASE / 4;
 			ret = 0;
 		break;
 		case BCM_BSC_ALL:
-		 	bcm_bsc0_base = peripherals_base + BCM_BSC0_BASE/4;
-		 	bcm_bsc1_base = peripherals_base + BCM_BSC1_BASE/4;
+		 	bcm_bsc0_base = peripherals_base + BCM_BSC0_BASE / 4;
+		 	bcm_bsc1_base = peripherals_base + BCM_BSC1_BASE / 4;
 		 	ret = 0;
 		break;
 		default: break;
@@ -155,18 +155,20 @@ int bcm_i2c_ReplaceBSC(bcmBSC bsc_choice)
 
 void bcm_i2c_setSlaveAddress(unsigned char addr)
 {
-	bcm_i2c_register_write(BCM_BSC_A,addr&0x7F)
+	bcm_i2c_register_write(BCM_BSC_A,addr&0x7F);
 }
 
-void bcm_i2c_write(const char * buf, unsigned int len)
+ bcm_i2c_write(const char * buf, unsigned int len)
 {	
 	unsigned int remaining = len;
 	unsigned int i = 0;
-
+	
+	unsigned int reason = BCM_I2C_REASON_OK;
+	
 	// Clear FIFO
 	bcm_i2c_set_bits(BCM_BSC_C,BCM_BSC_C_CLEAR_1,BCM_BSC_C_CLEAR_1);
 	// Clear Status
-	bcm_i2c_register_write(BSM_BSC_S, BCM_BSC_S_CLEAN_CLKT | BCM_BSC_S_CLEAN_ERR | BCM_BSC_S_DONE);
+	bcm_i2c_register_write(BCM_BSC_S, BCM_BSC_S_CLKT | BCM_BSC_S_ERR | BCM_BSC_S_DONE);
 	// Set Data Length
 	bcm_i2c_register_write(BCM_BSC_DLEN,len);
 	
@@ -186,7 +188,7 @@ void bcm_i2c_write(const char * buf, unsigned int len)
 	{
 		while(remaining &&(bcm_i2c_register_read(BCM_BSC_S) & BCM_BSC_S_TXD))
 		{
-			 Write to FIFO
+			//Write to FIFO
 			bcm_i2c_register_write(BCM_BSC_FIFO, buf[i]);
 			i++;
 			remaining--;
@@ -207,7 +209,7 @@ void bcm_i2c_write(const char * buf, unsigned int len)
 		reason = BCM_I2C_REASON_ERROR_DATA;
 	}
 
-	bcm_i2c_set_bits(BSM_BSC_S, BCM_BSC_S_DONE, BCM_BSC_S_DONE);
+	bcm_i2c_set_bits(BCM_BSC_S, BCM_BSC_S_DONE, BCM_BSC_S_DONE);
 
 	return reason;
 }
@@ -221,11 +223,11 @@ void bcm_i2c_read(char * buf, unsigned int len)
 	// Clear FIFO
 	bcm_i2c_set_bits(BCM_BSC_C,BCM_BSC_C_CLEAR_1,BCM_BSC_C_CLEAR_1);
 	// Clear Status
-	bcm_i2c_register_write_nb(BSM_BSC_S, BCM_BSC_S_CLEAN_CLKT | BCM_BSC_S_CLEAN_ERR | BCM_BSC_S_DONE);
+	bcm_i2c_register_write_nb(BCM_BSC_S, BCM_BSC_S_CLKT | BCM_BSC_S_ERR | BCM_BSC_S_DONE);
 	// Set Data Length
 	bcm_i2c_register_write_nb(BCM_BSC_DLEN,len);
 	// Start read
-	bcm_i2c_register_write_nb(BSM_BSC_S, BCM_BSC_C_I2CEN | BCM_BSC_C_ST | BCM_BSC_C_READ);
+	bcm_i2c_register_write_nb(BCM_BSC_S, BCM_BSC_C_I2CEN | BCM_BSC_C_ST | BCM_BSC_C_READ);
 
 	// wait for transfer to complete
 	while(!(bcm_i2c_register_read_nb(BCM_BSC_S) & BCM_BSC_S_DONE))
@@ -264,7 +266,7 @@ void bcm_i2c_read(char * buf, unsigned int len)
 		reason = BCM_I2C_REASON_ERROR_DATA;
 	}
 	
-	bcm_i2c_set_bits(BSM_BSC_S, BCM_BSC_S_DONE, BCM_BSC_S_DONE);
+	bcm_i2c_set_bits(BCM_BSC_S, BCM_BSC_S_DONE, BCM_BSC_S_DONE);
 	
 	return reason;
 }

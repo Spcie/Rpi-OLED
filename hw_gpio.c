@@ -1,4 +1,3 @@
-#include "hw_reg.h"
 #include "hw_gpio.h"
 
 
@@ -8,7 +7,7 @@ static void bcm_gpio_register_write_nb(volatile unsigned int* pAddr,unsigned int
 static void bcm_gpio_register_write(volatile unsigned int* pAddr,unsigned int value);
 static unsigned int bcm_gpio_register_read(volatile unsigned int* pAddr);
 static unsigned int bcm_gpio_register_read(volatile unsigned int* pAddr);
-static void bcm_gpio_set_bits(volatile unsigned int pAddr,unsigned int value,unsigned int mask);
+static void bcm_gpio_set_bits(volatile unsigned int* pAddr,unsigned int value,unsigned int mask);
 
 static void bcm_gpio_register_write_nb(volatile unsigned int* pAddr,unsigned int value)
 {

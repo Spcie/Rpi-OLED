@@ -3,8 +3,8 @@
 
 
 
-#define BCM_BSC0_BASE		0x00205000;
-#define BCM_BSC1_BASE		0x00804000;
+#define BCM_BSC0_BASE		0x00205000
+#define BCM_BSC1_BASE		0x00804000
 
 #define BCM_BSC_C 			0x0000 // BSC Master Control 
 #define BCM_BSC_S 			0x0004 // BSC Master Status 
@@ -60,9 +60,9 @@ typedef enum
 
 typedef enum 
 {
-	BCM_BSC0 = 0X00;	
-	BCM_BSC1 = 0X01;
-	BCM_BSC_ALL = 0X02;   //without BSC2 
+	BCM_BSC0 = 0X00,	
+	BCM_BSC1 = 0X01,
+	BCM_BSC_ALL = 0X02,   //without BSC2 
 }bcmBSC;
 
 int bcm_i2c_init(volatile unsigned int* peripherals_base, bcmBSC bsc_choice);

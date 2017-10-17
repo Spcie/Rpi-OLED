@@ -35,8 +35,8 @@
 
 typedef enum
 {
-	RPI_GPIO_02 = 2;
-	RPI_GPIO_03 = 3;
+	RPI_GPIO_02 = 2,
+	RPI_GPIO_03 = 3,
 }bcmGpio;
 
 typedef enum
