@@ -33,7 +33,7 @@ static unsigned long long bcm_st_read(void)
     else
     {
         st <<= 32;
-        st += bcm2835_peri_read(BCM_ST_CLO);
+        st += bcm_st_register_read(BCM_ST_CLO);
     }
 
     return st;
@@ -54,7 +54,7 @@ void bcm_st_delay_us(unsigned long long us)
 	start = bcm_st_read();
 	compare = start + us;
 
-	while(bcm2835_st_read() < compare);
+	while(bcm_st_read() < compare);
 }
 
 //delay ms without sleep
@@ -66,5 +66,5 @@ void bcm_st_delay_ms(unsigned int ms)
 	start = bcm_st_read();
 	compare = start + ms*1000;
 
-	while(bcm2835_st_read() < compare);
+	while(bcm_st_read() < compare);
 }
