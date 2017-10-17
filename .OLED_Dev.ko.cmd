@@ -1,1 +1,0 @@
-cmd_/home/pi/gitcode/Rpi-OLED/OLED_Dev.ko := ld -EL -r  -T ./scripts/module-common.lds --build-id  -o /home/pi/gitcode/Rpi-OLED/OLED_Dev.ko /home/pi/gitcode/Rpi-OLED/OLED_Dev.o /home/pi/gitcode/Rpi-OLED/OLED_Dev.mod.o ;  true
