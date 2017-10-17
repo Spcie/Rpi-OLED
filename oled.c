@@ -31,15 +31,27 @@ int IIC_Init(void);
 
 int IIC_Init(void)
 {
-	bcm2835_gpio = (volatile unsigned int *)ioremap(0x3f200000, 0x01000000);
-	//
+	volatile unsigned int* bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
+
+	//delay init
+	bcm_st_init(bcm_peripherals_base);
+
+	//gpio init 
+	bcm_gpio_init(bcm_peripherals_base);
+	bcm_gpio_fsel(RPI_GPIO_02, BCM_GPIO_FSEL_ALT1);
+	bcm_gpio_fsel(RPI_GPIO_03, BCM_GPIO_FSEL_ALT1);
+
+	//i2c init
+	bcm_i2c_init(bcm_peripherals_base,BCM_BSC1);
+	bcm_i2c_ReplaceBSC(BCM_BSC1);
+	bcm_i2c_setSlaveAddress(0x078);
 }
 
 void OLED_Init(void)
 {
 	IIC_Init();
 
-	Delay(500);
+	OLED_DelayMs(ms);
 
 	OLED_WriteCmd(0xAE);
 	OLED_WriteCmd(0x00);
@@ -73,22 +85,43 @@ void OLED_Init(void)
 	OLED_SetPos(0,0);
 }
 
+void OLED_DelayMs(unsigned int ms)
+{
+	bcm_st_delay_ms(ms);
+}
+
 static void OLED_WriteCmd(unsigned char cmd)
 {
+	/*
 	IIC_Start();
 	IIC_Send_Byte(0x78);
 	IIC_Send_Byte(0x00);
 	IIC_Send_Byte(cmd);
 	IIC_Stop();
+	*/
+	unsigned char buf[2];
+
+	buf[0] = 0x00;
+	buf[1] = cmd;
+
+	bcm_i2c_write(buf,2);
 }
 
 static void OLED_WriteData(unsigned char dat)
 {
+	/*
 	IIC_Start();
 	IIC_Send_Byte(0x78);
 	IIC_Send_Byte(0x40);
 	IIC_Send_Byte(dat);
 	IIC_Stop();
+	*/
+	unsigned char buf[2];
+
+	buf[0] = 0x40;
+	buf[1] = dat;
+
+	bcm_i2c_write(buf,2);
 }
 
 static void OLED_Fill(unsigned char FillData)
