@@ -158,12 +158,12 @@ void bcm_i2c_setSlaveAddress(unsigned char addr)
 	bcm_i2c_register_write(BCM_BSC_A,addr&0x7F);
 }
 
- bcm_i2c_write(const char * buf, unsigned int len)
+bcmI2CReasonCodes bcm_i2c_write(const char * buf, unsigned int len)
 {	
 	unsigned int remaining = len;
 	unsigned int i = 0;
 	
-	unsigned int reason = BCM_I2C_REASON_OK;
+	bcmI2CReasonCodes reason = BCM_I2C_REASON_OK;
 	
 	// Clear FIFO
 	bcm_i2c_set_bits(BCM_BSC_C,BCM_BSC_C_CLEAR_1,BCM_BSC_C_CLEAR_1);
@@ -214,11 +214,11 @@ void bcm_i2c_setSlaveAddress(unsigned char addr)
 	return reason;
 }
 
-void bcm_i2c_read(char * buf, unsigned int len)
+bcmI2CReasonCodes bcm_i2c_read(char * buf, unsigned int len)
 {
 	unsigned int i = 0;
 	unsigned int remaining = len;
-	unsigned char reason;
+	bcmI2CReasonCodes reason;
 
 	// Clear FIFO
 	bcm_i2c_set_bits(BCM_BSC_C,BCM_BSC_C_CLEAR_1,BCM_BSC_C_CLEAR_1);
