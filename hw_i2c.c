@@ -15,10 +15,9 @@
 #include "hw_i2c.h"
 #include "hw_gpio.h"
 
-
-
-static volatile unsigned int *bcm_bsc_base;
-
+static volatile unsigned int *bcm_bsc_base = 0x00000000;
+static volatile unsigned int *bcm_bsc0_base = 0x00000000;
+static volatile unsigned int *bcm_bsc1_base = 0x00000000;
 static int i2c_byte_wait_us = 0;
 
 static void bcm_i2c_set_bits(unsigned int RegOfst,unsigned int value);
@@ -26,7 +25,6 @@ static void bcm_i2c_register_write_nb(unsigned int RegOfst,unsigned int value);
 static void bcm_i2c_register_write(unsigned int RegOfst,unsigned int value);
 static unsigned int bcm_i2c_register_read_nb(unsigned int RegOfst);
 static unsigned int bcm_i2c_register_read(unsigned int RegOfst);
-static void bcm_i2c_setSlaveAddress(unsigned char addr);
 static void bcm_i2c_setClockDivider(unsigned int divider);
 static void bcm_i2c_setBaudRate(unsigned int baudrate);
 static void bcm_i2c_begin(void);
@@ -77,11 +75,6 @@ static void bcm_i2c_set_bits(unsigned int RegOfst,unsigned int value,unsigned in
 	bcm_i2c_register_write(RegOfst,val);
 }
 
-static void bcm_i2c_setSlaveAddress(unsigned char addr)
-{
-	bcm_i2c_register_write(BCM_BSC_A,addr&0x7F)
-}
-
 static void bcm_i2c_setClockDivider(unsigned int divider)
 {
 	bcm_peri_write(BCM_BSC_DIV, divider&0xFF);
@@ -110,14 +103,73 @@ static void bcm_i2c_end(void)
 
 }
 
-void bcm_i2c_init(void)
+int bcm_i2c_init(volatile unsigned int* peripherals_base, bcmBSC bsc_choice)
 {
-
+	int ret = -1;
+	switch(bsc_choice)
+	{
+		case BCM_BSC0:
+			bcm_bsc0_base = peripherals_base + BCM_BSC0_BASE/4;
+			ret = 0;
+		break;
+		case BCM_BSC1:
+			bcm_bsc1_base = peripherals_base + BCM_BSC1_BASE/4;
+			ret = 0;
+		break;
+		case BCM_BSC_ALL:
+		 	bcm_bsc0_base = peripherals_base + BCM_BSC0_BASE/4;
+		 	bcm_bsc1_base = peripherals_base + BCM_BSC1_BASE/4;
+		 	ret = 0;
+		break;
+		default: break;
+	}
+	return ret;
 }
 
-void bcm_i2c_uninit(void)
+void bcm_i2c_uninit(bcmBSC bsc_choice)
 {
+	switch(bsc_choice)
+	{
+		case BCM_BSC0:
+			bcm_bsc0_base = 0x00000000;
+		break;
+		case BCM_BSC1:
+			bcm_bsc1_base = 0x00000000;
+		break;
+		case BCM_BSC_ALL:
+			bcm_bsc0_base = 0x00000000;
+			bcm_bsc1_base = 0x00000000;
+		break;
+		default: break;
+	}
 
+	if ((bcm_bsc0_base == 0x00000000) && (bcm_bsc1_base == 0x00000000))
+	{
+		bcm_bsc_base = 0x00000000;
+	}
+}
+
+int bcm_i2c_ReplaceBSC(bcmBSC bsc_choice)
+{
+	switch(bsc_choice)
+	{
+		case BCM_BSC0:
+			bcm_bsc_base = bcm_bsc0_base;
+		break;
+		case BCM_BSC1:
+			bcm_bsc_base = bcm_bsc1_base;
+		break;
+		default: break;
+	}
+	if(bcm_bsc_base == 0x00000000)
+	{
+		return -1;
+	}
+}
+
+void bcm_i2c_setSlaveAddress(unsigned char addr)
+{
+	bcm_i2c_register_write(BCM_BSC_A,addr&0x7F)
 }
 
 void bcm_i2c_write(const char * buf, unsigned int len)
