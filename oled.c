@@ -16,7 +16,7 @@
 #include "hw_gpio.h"
 #include "hw_i2c.h"
 
-const unsigned char F8X16[]=	  
+const unsigned char F8X16[]=
 {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,// 0
   0x00,0x00,0x00,0xF8,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x33,0x30,0x00,0x00,0x00,//! 1
@@ -167,7 +167,7 @@ static int IIC_Init(void)
 	//delay init
 	bcm_st_init(bcm_peripherals_base);
 
-	//gpio init 
+	//gpio init
 	bcm_gpio_init(bcm_peripherals_base);
 	bcm_gpio_fsel(RPI_GPIO_02, BCM_GPIO_FSEL_ALT1);
 	bcm_gpio_fsel(RPI_GPIO_03, BCM_GPIO_FSEL_ALT1);
@@ -234,7 +234,7 @@ static void OLED_Fill(unsigned char FillData)
 }
 
 static void OLED_SetPos(unsigned char x, unsigned char y)
-{ 
+{
 	OLED_WriteCmd(0xb0+y);
 	OLED_WriteCmd(((x&0xf0)>>4)|0x10);
 	OLED_WriteCmd((x&0x0f)|0x01);
@@ -259,4 +259,10 @@ void OLED_StringShow(unsigned char x, unsigned char y,unsigned char ch[])
 	}
 }
 
-
+void debug_text(void)
+{
+  volatile unsigned int* bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
+  bcm_gpio_init(bcm_peripherals_base);
+  bcm2835_gpio_fsel(PIN,BCM2835_GPIO_FSEL_OUTP);
+  bcm2835_gpio_set(PIN);
+}
