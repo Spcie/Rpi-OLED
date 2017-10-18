@@ -25,7 +25,6 @@ static void bcm_i2c_register_write_nb(unsigned int RegOfst,unsigned int value);
 static void bcm_i2c_register_write(unsigned int RegOfst,unsigned int value);
 static unsigned int bcm_i2c_register_read_nb(unsigned int RegOfst);
 static unsigned int bcm_i2c_register_read(unsigned int RegOfst);
-static void bcm_i2c_setClockDivider(unsigned int divider);
 static void bcm_i2c_setBaudRate(unsigned int baudrate);
 static void bcm_i2c_begin(void);
 static void bcm_i2c_end(void);
@@ -75,7 +74,7 @@ static void bcm_i2c_set_bits(unsigned int RegOfst,unsigned int value,unsigned in
 	bcm_i2c_register_write(RegOfst,val);
 }
 
-static void bcm_i2c_setClockDivider(unsigned int divider)
+void bcm_i2c_setClockDivider(unsigned int divider)
 {
 	bcm_i2c_register_write(BCM_BSC_DIV, divider&0xFF);
 	
