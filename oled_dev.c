@@ -37,11 +37,12 @@ int IoCtrl_release(struct inode * inode, struct file *filp)
 static ssize_t IoCtrl_read(struct file *filp, char __user *buf, size_t size, loff_t *ppos)
 {
 	int ret = 0;
-	
+
 	printk("----- misc read-----\n");
 	OLED_Init();
-	
+
 	OLED_StringShow(0,0,"hello word");
+	printk("----- misc read out-----\n");
 	return ret;
 }
 
@@ -61,7 +62,7 @@ static loff_t IoCtrl_llseek(struct file *filp, loff_t offset, int whence)
 
 long IoC_ioctl(struct file*filp,unsigned int cmd,unsigned long arg)
 {
-	
+
 	switch(cmd)
 	{
 		case IOCTRL_ON : break;
@@ -69,10 +70,10 @@ long IoC_ioctl(struct file*filp,unsigned int cmd,unsigned long arg)
 		default:
 			return -EINVAL;
 	}
-	
+
 	return 0;
 }
-static const struct file_operations IoCtrl_fops = 
+static const struct file_operations IoCtrl_fops =
 {
 	.owner = THIS_MODULE,
 	.llseek = IoCtrl_llseek,
@@ -95,8 +96,8 @@ static int IoCtrl_init(void)
 
 	printk("----- misc test init-----\n");
 	result = misc_register(&misc_dev);
-	
-	
+
+
 
 
 	printk("loCtrl device installed\n");
@@ -108,10 +109,10 @@ static void IoCtrl_exit(void)
 {
 	/*取消映射*/
 	//iounmap(bcm2835_gpio);
-	
+
 	/*注销设备号*/
 	misc_deregister(&misc_dev);
-	
+
 	printk("loCtrl device uninstalled\n");
 }
 
@@ -120,4 +121,3 @@ MODULE_LICENSE("GPL");
 
 module_init(IoCtrl_init);
 module_exit(IoCtrl_exit);
-
