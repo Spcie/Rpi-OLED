@@ -39,10 +39,10 @@ static ssize_t IoCtrl_read(struct file *filp, char __user *buf, size_t size, lof
 	int ret = 0;
 
 	printk("----- misc read-----\n");
-	debug_text();
-	//OLED_Init();
+	//debug_text();
+	OLED_Init();
 
-	//OLED_StringShow(0,0,"hello word");
+	OLED_StringShow(0,0,"hello word");
 	printk("----- misc read out-----\n");
 	return ret;
 }
@@ -110,7 +110,7 @@ static void IoCtrl_exit(void)
 {
 	/*取消映射*/
 	//iounmap(bcm2835_gpio);
-
+	OLED_unInit();
 	/*注销设备号*/
 	misc_deregister(&misc_dev);
 
