@@ -68,6 +68,7 @@ typedef enum
 int bcm_i2c_init(volatile unsigned int* peripherals_base, bcmBSC bsc_choice);
 void bcm_i2c_uninit(bcmBSC bsc_choice);
 int bcm_i2c_ReplaceBSC(bcmBSC bsc_choice);
+void bcm_i2c_setClockDivider(unsigned int divider);
 void bcm_i2c_setSlaveAddress(unsigned char addr);
 bcmI2CReasonCodes bcm_i2c_write(const char * buf, unsigned int len);
 bcmI2CReasonCodes bcm_i2c_read(char * buf, unsigned int len);
