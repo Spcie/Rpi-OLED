@@ -115,6 +115,8 @@ const unsigned char F8X16[]=
   0x00,0x06,0x01,0x01,0x02,0x02,0x04,0x04,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,//~ 94
 };
 
+static volatile unsigned int* bcm_peripherals_base;
+
 static void OLED_DelayMs(unsigned int ms);
 static void OLED_WriteCmd(unsigned char cmd);
 static void OLED_WriteData(unsigned char dat);
@@ -159,10 +161,14 @@ void OLED_Init(void)
 	OLED_Fill(0x00);
 	OLED_SetPos(0,0);
 }
+void OLED_unInit(void)
+{
+    iounmap(bcm_peripherals_base);
+}
 
 static int IIC_Init(void)
 {
-	volatile unsigned int* bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
+	bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
 
 	//delay init
 	bcm_st_init(bcm_peripherals_base);
