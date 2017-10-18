@@ -183,6 +183,8 @@ static int IIC_Init(void)
 	bcm_i2c_ReplaceBSC(BCM_BSC1);
 	bcm_i2c_setSlaveAddress(0x078);
 	bcm_i2c_setClockDivider(BCM_I2C_CLOCK_DIVIDER_148);
+
+  return 0;
 }
 
 static void OLED_DelayMs(unsigned int ms)
