@@ -42,7 +42,7 @@ static ssize_t IoCtrl_read(struct file *filp, char __user *buf, size_t size, lof
 	debug_text();
 	//OLED_Init();
 
-	OLED_StringShow(0,0,"hello word");
+	//OLED_StringShow(0,0,"hello word");
 	printk("----- misc read out-----\n");
 	return ret;
 }
