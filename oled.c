@@ -271,6 +271,6 @@ void debug_text(void)
 {
   volatile unsigned int* bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
   bcm_gpio_init(bcm_peripherals_base);
-  bcm_gpio_fsel(RPI_GPIO_02,BCM_GPIO_FSEL_OUTP);
-  bcm_gpio_set(RPI_GPIO_02);
+  bcm_gpio_fsel(RPI_GPIO_03,BCM_GPIO_FSEL_OUTP);
+  bcm_gpio_set(RPI_GPIO_03);
 }
