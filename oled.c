@@ -181,7 +181,7 @@ static int IIC_Init(void)
 	//i2c init
 	bcm_i2c_init(bcm_peripherals_base,BCM_BSC1);
 	bcm_i2c_ReplaceBSC(BCM_BSC1);
-	bcm_i2c_setSlaveAddress(0x078);
+	bcm_i2c_setSlaveAddress(0x78>>1);
 	bcm_i2c_setClockDivider(BCM_I2C_CLOCK_DIVIDER_148);
 
   return 0;
@@ -217,11 +217,19 @@ static void OLED_WriteData(unsigned char dat)
 	IIC_Send_Byte(0x40);
 	IIC_Send_Byte(dat);
 	IIC_Stop();
-	*/
+  */
+ 
 	unsigned char buf[2];
-
+  
 	buf[0] = 0x40;
-	buf[1] = dat;
+  buf[1] = dat;
+ 
+   /*
+  unsigned char buf[3];
+  buf[0] = 0x78;
+  buf[1] = 0x40;
+  buf[2] = dat;
+  */
 
 	bcm_i2c_write(buf,2);
 }
