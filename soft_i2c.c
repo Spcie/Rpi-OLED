@@ -6,8 +6,7 @@
 static void i2c_sda_set(unsigned char lev);
 static void i2c_scl_set(unsigned char lev);
 static unsigned char i2c_sda_read(void);
-static void delay_us(unsigned int us);
-static void i2c_waitAck(void);
+static unsigned char i2c_waitAck(void);
 static void i2c_Ack(void);
 static void i2c_NAck(void);
 
@@ -34,41 +33,21 @@ static void i2c_scl_set(unsigned char lev)
         bcm_gpio_clr(RPI_GPIO_03);
     }
 }
+
 static unsigned char i2c_sda_read(void)
 {
     //wait
     return 0;
 }
-static void delay_us(unsigned int us)
-{
-    bcm_st_delay_us(us);
-}
-void soft_i2c_Start(void)
-{
-    i2c_scl_set(1);
-    i2c_sda_set(1);
-    delay_us(4);
-    i2c_scl_set(0);
-    delay_us(4);
-    i2c_scl_set(0);
-}
-void soft_i2c_Stop(void)
-{
-    i2c_scl_set(0);
-    i2c_sda_set(0);
-    delay_us(4);
-    i2c_scl_set(1);
-    delay_us(4);
-    i2c_scl_set(1);
-}
-static void i2c_waitAck(void)
+
+static unsigned char i2c_waitAck(void)
 {
     unsigned char ucErrTime = 0;
 
     i2c_sda_set(1);
-    delay_us(1);
+    soft_i2c_delay_us(1);
     i2c_scl_set(1);
-    delay_us(1);
+    soft_i2c_delay_us(1);
 
     while(i2c_sda_read())
     {
@@ -78,18 +57,19 @@ static void i2c_waitAck(void)
 			soft_i2c_Stop();
 			return 1;
         }
-        delay_us(1);
+        soft_i2c_delay_us(1);
     }
     i2c_scl_set(0);
+    return 0;
 }
 
 static void i2c_Ack(void)
 {
     i2c_scl_set(0);
     i2c_sda_set(0);
-    delay_us(2);
+    soft_i2c_delay_us(2);
     i2c_scl_set(1);
-    delay_us(2);
+    soft_i2c_delay_us(2);
     i2c_scl_set(0);
 }
 
@@ -97,12 +77,40 @@ static void i2c_NAck(void)
 {
     i2c_scl_set(0);
     i2c_sda_set(1);
-    delay_us(2);
+    soft_i2c_delay_us(2);
     i2c_scl_set(1);
-    delay_us(2);
+    soft_i2c_delay_us(2);
     i2c_scl_set(0);
 }
 
+void soft_i2c_delay_us(unsigned int us)
+{
+    bcm_st_delay_us(us);
+}
+
+void soft_i2c_delay_ms(unsigned int ms)
+{
+    bcm_st_delay_ms(ms);
+}
+
+void soft_i2c_Start(void)
+{
+    i2c_scl_set(1);
+    i2c_sda_set(1);
+    soft_i2c_delay_us(4);
+    i2c_scl_set(0);
+    soft_i2c_delay_us(4);
+    i2c_scl_set(0);
+}
+void soft_i2c_Stop(void)
+{
+    i2c_scl_set(0);
+    i2c_sda_set(0);
+    soft_i2c_delay_us(4);
+    i2c_scl_set(1);
+    soft_i2c_delay_us(4);
+    i2c_scl_set(1);
+}
 
 void soft_i2c_init(volatile unsigned int* peripherals_base)
 {
@@ -121,11 +129,11 @@ void soft_i2c_sendByte(char byt)
     {
         i2c_sda_set((byt & 0x80) >> 7);
         byt <<= 1;
-        delay_us(2);
+        soft_i2c_delay_us(2);
         i2c_scl_set(1);
-        delay_us(2);
+        soft_i2c_delay_us(2);
         i2c_scl_set(0);
-        delay_us(2);
+        soft_i2c_delay_us(2);
     }
     i2c_sda_set(1);
     i2c_scl_set(1);
@@ -141,11 +149,11 @@ char soft_i2c_readByte(unsigned char ack)
     for(i = 0; i < 8; i++)
     {
         i2c_scl_set(0);
-        delay_us(2);
+        soft_i2c_delay_us(2);
         i2c_scl_set(1);
         receive <<= 1;
         if (i2c_sda_read()) receive++;
-        delay_us(1);
+        soft_i2c_delay_us(1);
     }
     if(!ack)
     {
@@ -155,4 +163,5 @@ char soft_i2c_readByte(unsigned char ack)
     {
         i2c_Ack();
     }
+    return receive;
 }
