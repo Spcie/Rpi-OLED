@@ -15,6 +15,7 @@
 #include "hw_delay.h"
 #include "hw_gpio.h"
 #include "hw_i2c.h"
+#include "soft_i2c.h"
 
 const unsigned char F8X16[]=
 {
@@ -166,13 +167,18 @@ void OLED_unInit(void)
     iounmap(bcm_peripherals_base);
 }
 
+
+
 static int IIC_Init(void)
 {
 	bcm_peripherals_base = (volatile unsigned int *)ioremap(0x3f000000, 0x01000000);
-
+ 
+  
+  /*
 	//delay init
 	bcm_st_init(bcm_peripherals_base);
 
+ 
 	//gpio init
 	bcm_gpio_init(bcm_peripherals_base);
 	bcm_gpio_fsel(RPI_GPIO_02, BCM_GPIO_FSEL_ALT1);
@@ -183,6 +189,9 @@ static int IIC_Init(void)
 	bcm_i2c_ReplaceBSC(BCM_BSC1);
 	bcm_i2c_setSlaveAddress(0x78>>1);
 	bcm_i2c_setClockDivider(BCM_I2C_CLOCK_DIVIDER_148);
+  */
+  soft_i2c_init(bcm_peripherals_base);
+
 
   return 0;
 }
@@ -194,44 +203,40 @@ static void OLED_DelayMs(unsigned int ms)
 
 static void OLED_WriteCmd(unsigned char cmd)
 {
-	/*
-	IIC_Start();
-	IIC_Send_Byte(0x78);
-	IIC_Send_Byte(0x00);
-	IIC_Send_Byte(cmd);
-	IIC_Stop();
-	*/
+	
+	soft_i2c_Start();
+	soft_i2c_sendByte(0x78);
+	soft_i2c_sendByte(0x00);
+	soft_i2c_sendByte(cmd);
+	soft_i2c_Stop();
+  
+  /*
 	unsigned char buf[2];
 
 	buf[0] = 0x00;
 	buf[1] = cmd;
 
-	bcm_i2c_write(buf,2);
+  bcm_i2c_write(buf,2);
+  */
 }
 
 static void OLED_WriteData(unsigned char dat)
 {
-	/*
-	IIC_Start();
-	IIC_Send_Byte(0x78);
-	IIC_Send_Byte(0x40);
-	IIC_Send_Byte(dat);
-	IIC_Stop();
-  */
- 
+	
+	soft_i2c_Start();
+	soft_i2c_sendByte(0x78);
+	soft_i2c_sendByte(0x40);
+	soft_i2c_sendByte(dat);
+	soft_i2c_Stop();
+  
+ /*
 	unsigned char buf[2];
   
 	buf[0] = 0x40;
   buf[1] = dat;
- 
-   /*
-  unsigned char buf[3];
-  buf[0] = 0x78;
-  buf[1] = 0x40;
-  buf[2] = dat;
-  */
 
-	bcm_i2c_write(buf,2);
+  bcm_i2c_write(buf,2);
+  */
 }
 
 static void OLED_Fill(unsigned char FillData)
