@@ -18,8 +18,8 @@
 #include "hw_i2c.h"
 #include "soft_i2c.h"
 
-#define HARDWARE_I2C  //hardwav
-//undef HARDWARE_I2C
+#define HARDWARE_I2C
+//#undef HARDWARE_I2C
 
 static volatile unsigned int* bcm_peripherals_base;
 
@@ -93,7 +93,7 @@ static int IIC_Init(void)
 	bcm_i2c_setSlaveAddress(0x78>>1);
 	bcm_i2c_setClockDivider(BCM_I2C_CLOCK_DIVIDER_148);
 #else
-  soft_i2c_init(bcm_peripherals_base);
+	soft_i2c_init(bcm_peripherals_base);
 #endif
 
   return 0;
@@ -102,9 +102,9 @@ static int IIC_Init(void)
 static void OLED_DelayMs(unsigned int ms)
 {
 #ifdef HARDWARE_I2C
-  bcm_st_delay_ms(ms);
+	bcm_st_delay_ms(ms);
 #else
-  soft_i2c_delay_ms(ms);
+	soft_i2c_delay_ms(ms);
 #endif  
 }
 
@@ -112,12 +112,12 @@ static void OLED_WriteCmd(unsigned char cmd)
 {
 #ifdef HARDWARE_I2C
   
-unsigned char buf[2];
+	unsigned char buf[2];
 
 	buf[0] = 0x00;
 	buf[1] = cmd;
 
-  bcm_i2c_write(buf,2);
+	bcm_i2c_write(buf,2);
 #else
 	soft_i2c_Start();
 	soft_i2c_sendByte(0x78);
@@ -131,18 +131,18 @@ static void OLED_WriteData(unsigned char dat)
 {
 #ifdef HARDWARE_I2C
   
-  unsigned char buf[2];
+	unsigned char buf[2];
 
-  buf[0] = 0x40;
-  buf[1] = dat;
+	buf[0] = 0x40;
+	buf[1] = dat;
 
-  bcm_i2c_write(buf,2);
+	bcm_i2c_write(buf,2);
 #else
-  soft_i2c_Start();
-  soft_i2c_sendByte(0x78);
-  soft_i2c_sendByte(0x40);
-  soft_i2c_sendByte(dat);
-  soft_i2c_Stop();
+	soft_i2c_Start();
+	soft_i2c_sendByte(0x78);
+	soft_i2c_sendByte(0x40);
+	soft_i2c_sendByte(dat);
+	soft_i2c_Stop();
 #endif
 }
 

@@ -98,7 +98,7 @@ void soft_i2c_Start(void)
     i2c_scl_set(1);
     i2c_sda_set(1);
     soft_i2c_delay_us(4);
-    i2c_scl_set(0);
+    i2c_sda_set(0);
     soft_i2c_delay_us(4);
     i2c_scl_set(0);
 }
@@ -108,8 +108,8 @@ void soft_i2c_Stop(void)
     i2c_sda_set(0);
     soft_i2c_delay_us(4);
     i2c_scl_set(1);
+    i2c_sda_set(1);
     soft_i2c_delay_us(4);
-    i2c_scl_set(1);
 }
 
 void soft_i2c_init(volatile unsigned int* peripherals_base)
@@ -121,7 +121,7 @@ void soft_i2c_init(volatile unsigned int* peripherals_base)
     bcm_gpio_fsel(RPI_GPIO_03, BCM_GPIO_FSEL_OUTP);
 }
 
-void soft_i2c_sendByte(char byt)
+void soft_i2c_sendByte(unsigned char byt)
 {
     unsigned char t;
     i2c_scl_set(0);
