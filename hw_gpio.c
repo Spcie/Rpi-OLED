@@ -1,16 +1,3 @@
-#include <linux/module.h>
-#include <linux/types.h>
-#include <linux/fs.h>
-#include <linux/errno.h>
-#include <linux/slab.h>
-#include <linux/mm.h>
-#include <linux/sched.h>
-#include <linux/init.h>
-#include <linux/cdev.h>
-#include <linux/slab.h>
-#include <asm/io.h>
-#include <linux/miscdevice.h>
-#include <asm/uaccess.h>
 
 #include "hw_gpio.h"
 
@@ -72,7 +59,7 @@ int bcm_gpio_init(volatile unsigned int* peripherals_base)
 	}
 }
 
-void bcm_gpio_unint(void)
+void bcm_gpio_uninit(void)
 {
 	bcm_gpio = 0x00000000;
 }

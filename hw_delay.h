@@ -8,5 +8,5 @@
 int bcm_st_init(volatile unsigned int* peripherals_base);
 void bcm_st_delay_us(unsigned long long us);
 void bcm_st_delay_ms(unsigned int ms);
-
+void bcm_st_uninit(void);
 #endif

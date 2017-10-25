@@ -36,7 +36,15 @@
 typedef enum
 {
 	RPI_GPIO_02 = 2,
-	RPI_GPIO_03 = 3,
+    RPI_GPIO_03 = 3,
+    RPI_GPIO_04 = 4,
+    RPI_GPIO_05 = 5,
+    RPI_GPIO_06 = 6,
+    RPI_GPIO_07 = 7,
+    RPI_GPIO_08 = 8,
+    RPI_GPIO_09 = 9,
+    RPI_GPIO_10 = 10,
+    RPI_GPIO_11 = 11,
 }bcmGpio;
 
 typedef enum
@@ -53,7 +61,7 @@ typedef enum
 } bcmFunctionSelect;
 
 int bcm_gpio_init(volatile unsigned int* peripherals_base);
-void bcm_gpio_unint(void);
+void bcm_gpio_uninit(void);
 void bcm_gpio_fsel(unsigned char pin, unsigned char mode);
 void bcm_gpio_set(unsigned char pin);
 void bcm_gpio_clr(unsigned char pin);

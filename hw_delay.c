@@ -82,3 +82,8 @@ void bcm_st_delay_ms(unsigned int ms)
 
 	while(bcm_st_read() < compare);
 }
+
+void bcm_st_uninit(void)
+{
+	bcm_SysTimer = 0x00000000;
+}
